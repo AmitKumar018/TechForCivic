@@ -3,13 +3,10 @@ import Issue from "../models/Issue.js";
 
 const router = express.Router();
 
-/**
- * 📊 Public Citizen Analytics Routes
- * These are safe and don't expose sensitive data
- */
 
-// ✅ Get all issues (safe fields only)
-router.get("/analytics/issues", async (_req, res) => {
+
+// Get all issues (safe fields only)
+router.get("/issues", async (_req, res) => {
   try {
     const issues = await Issue.find().select("category status createdAt updatedAt");
     res.json({ success: true, data: issues });
@@ -19,8 +16,8 @@ router.get("/analytics/issues", async (_req, res) => {
   }
 });
 
-// ✅ Overall stats (total, pending, solved)
-router.get("/analytics/stats", async (_req, res) => {
+//  Overall stats (total, pending, solved)
+router.get("/stats", async (_req, res) => {
   try {
     const total = await Issue.countDocuments();
     const pending = await Issue.countDocuments({ status: "Pending" });
@@ -36,8 +33,8 @@ router.get("/analytics/stats", async (_req, res) => {
   }
 });
 
-// ✅ Category stats (for Bar & Pie charts)
-router.get("/analytics/category-stats", async (_req, res) => {
+// Category stats (for Bar & Pie charts)
+router.get("/category-stats", async (_req, res) => {
   try {
     const categories = await Issue.aggregate([
       { $group: { _id: "$category", count: { $sum: 1 } } },
@@ -52,14 +49,14 @@ router.get("/analytics/category-stats", async (_req, res) => {
   }
 });
 
-
-router.get("/analytics/solved-monthly", async (_req, res) => {
+// Monthly solved issues (for Line chart)
+router.get("/solved-monthly", async (_req, res) => {
   try {
     const monthly = await Issue.aggregate([
       { $match: { status: "Solved" } },
       {
         $group: {
-          _id: { $dateToString: { format: "%b %Y", date: "$updatedAt" } }, // e.g., "Oct 2025"
+          _id: { $dateToString: { format: "%b %Y", date: "$updatedAt" } },
           count: { $sum: 1 },
         },
       },
