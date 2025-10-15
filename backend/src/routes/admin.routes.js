@@ -5,13 +5,13 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// ✅ Admin: get all users
+//  Admin: get all users
 router.get("/users", authMiddleware, isAdmin, async (_req, res) => {
   const users = await User.find().select("-password");
   res.json({ success: true, users });
 });
 
-// ✅ Admin: get all issues
+// Admin: get all issues
 router.get("/issues", authMiddleware, isAdmin, async (_req, res) => {
   const issues = await Issue.find()
     .populate("createdBy", "name email")
@@ -19,7 +19,7 @@ router.get("/issues", authMiddleware, isAdmin, async (_req, res) => {
   res.json({ success: true, data: issues });
 });
 
-// ✅ Admin: update issue status
+// Admin: update issue status
 router.put("/issues/status/:id", authMiddleware, isAdmin, async (req, res) => {
   const { status } = req.body;
 
@@ -40,7 +40,7 @@ router.put("/issues/status/:id", authMiddleware, isAdmin, async (req, res) => {
   res.json({ success: true, data: issue });
 });
 
-// ✅ Admin: assign issue to a staff member
+// Admin: assign issue to a staff member
 router.put("/issues/assign/:id", authMiddleware, isAdmin, async (req, res) => {
   const { staffId } = req.body;
 
@@ -63,13 +63,13 @@ router.put("/issues/assign/:id", authMiddleware, isAdmin, async (req, res) => {
   res.json({ success: true, data: issue });
 });
 
-// ✅ Admin: delete an issue
+// Admin: delete an issue
 router.delete("/issues/:id", authMiddleware, isAdmin, async (req, res) => {
   await Issue.findByIdAndDelete(req.params.id);
   res.json({ success: true, message: "Issue deleted" });
 });
 
-// ✅ Admin: basic statistics
+//  Admin: basic statistics
 router.get("/stats", authMiddleware, isAdmin, async (_req, res) => {
   const total = await Issue.countDocuments();
   const pending = await Issue.countDocuments({ status: "Pending" });

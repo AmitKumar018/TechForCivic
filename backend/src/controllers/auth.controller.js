@@ -64,7 +64,7 @@ export const signup = ah(async (req, res) => {
   });
 });
 
-// ---------------------- LOGIN ----------------------
+
 export const login = ah(async (req, res) => {
   const { email, password, role } = req.body;
 

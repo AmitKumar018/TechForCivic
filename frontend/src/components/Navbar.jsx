@@ -18,7 +18,7 @@ export default function Navbar() {
           TechforCivic
         </Typography>
 
-        {/* ✅ Home (always visible) */}
+        {/* Home (always visible) */}
         <Link className="btn btn-light me-2" to="/">
           Home
         </Link>

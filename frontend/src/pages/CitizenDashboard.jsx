@@ -16,7 +16,7 @@ import { useAuth } from "../context/AuthContext";
 export default function CitizenDashboard() {
   const { user } = useAuth();
   const [issues, setIssues] = useState([]);
-  const [search, setSearch] = useState(""); // 🔍 search state
+  const [search, setSearch] = useState(""); // search state
   const [form, setForm] = useState({
     title: "",
     description: "",
