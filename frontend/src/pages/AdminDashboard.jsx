@@ -77,7 +77,7 @@ export default function AdminDashboard() {
 
     const interval = setInterval(() => {
       load(category, priority);
-    }, 10000);
+    },300000);
 
     return () => clearInterval(interval);
   }, [category, priority]);
