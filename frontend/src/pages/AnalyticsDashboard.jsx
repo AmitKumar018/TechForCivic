@@ -46,7 +46,7 @@ export default function AnalyticsDashboard() {
         const solvedRes = await api.get("/api/analytics/solved-monthly");
         setSolvedMonthly(solvedRes.data.data || []);
       } else {
-        // 👤 Citizen: read-only analytics
+        // Citizen: read-only analytics
         const statsRes = await api.get("/api/analytics/stats");
         setStats(statsRes.data.data);
 
@@ -87,7 +87,7 @@ export default function AnalyticsDashboard() {
   return (
     <div>
       <Typography variant="h4" gutterBottom>
-        📊 Analytics Dashboard
+        Analytics Dashboard
       </Typography>
 
       {/* Top Stats */}

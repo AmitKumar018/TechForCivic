@@ -19,7 +19,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [users, setUsers] = useState([]); // 👥 staff list
+  const [users, setUsers] = useState([]); // staff list
   const [category, setCategory] = useState("All");
   const [priority, setPriority] = useState("All");
   const [search, setSearch] = useState("");

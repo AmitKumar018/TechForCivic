@@ -10,7 +10,7 @@ const allowedAdmins = process.env.ALLOWED_ADMINS?.split(",") || [];
 const signToken = (id, role) =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-// ---------------------- SIGNUP ----------------------
+// SIGNUP 
 export const signup = ah(async (req, res) => {
   const { name, email, password, role } = req.body;
 

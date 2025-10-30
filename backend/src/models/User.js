@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🚨 Pre-save hook to prevent creating more than MAX_ADMINS
+//  Pre-save hook to prevent creating more than MAX_ADMINS
 userSchema.pre("save", async function (next) {
   if (this.role === "admin" && this.isNew) {
     const adminCount = await mongoose.models.User.countDocuments({ role: "admin" });
