@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";   // ✅ useNavigate
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 const AuthCtx = createContext(null);
@@ -10,14 +10,19 @@ export const AuthProvider = ({ children }) => {
     return raw ? JSON.parse(raw) : null;
   });
 
-  const nav = useNavigate();  // ✅ init navigator
+  const nav = useNavigate();
 
-  // LOGIN
+  // ✅ LOGIN FIXED
   const login = async (email, password, role) => {
-    const { data } = await api.post("/api/auth/login", { email, password, role });
+    const { data } = await api.post("/api/auth/login", {
+      email,
+      password,
+      role,
+    });
 
-    const token = data.token;
-    const userData = data.user;
+    // ✅ Backend returns { success: true, data: { token, user } }
+    const token = data?.data?.token;
+    const userData = data?.data?.user;
 
     if (!token || !userData) {
       throw new Error("Invalid login response format");
@@ -27,13 +32,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("tfc_user", JSON.stringify(userData));
     setUser(userData);
 
-    // navigate without refresh
     nav(userData.role === "admin" ? "/admin" : "/dashboard");
-
     return userData;
   };
 
-  // SIGNUP
+  // ✅ SIGNUP FIXED
   const signup = async (name, email, password, role) => {
     const { data } = await api.post("/api/auth/signup", {
       name,
@@ -42,8 +45,8 @@ export const AuthProvider = ({ children }) => {
       role,
     });
 
-    const token = data.token;
-    const userData = data.user;
+    const token = data?.data?.token;
+    const userData = data?.data?.user;
 
     if (!token || !userData) {
       throw new Error("Invalid signup response format");
@@ -53,19 +56,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("tfc_user", JSON.stringify(userData));
     setUser(userData);
 
-    // navigate without refresh
     nav(userData.role === "admin" ? "/admin" : "/dashboard");
-
     return userData;
   };
 
-  // LOGOUT
+  // ✅ LOGOUT
   const logout = () => {
     localStorage.removeItem("tfc_token");
     localStorage.removeItem("tfc_user");
     setUser(null);
-
-    nav("/login");   // ✅ navigate instead of reload
+    nav("/login");
   };
 
   return (
