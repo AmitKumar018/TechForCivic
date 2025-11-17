@@ -10,13 +10,17 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Box,
+  Divider,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
 export default function CitizenDashboard() {
   const { user } = useAuth();
   const [issues, setIssues] = useState([]);
-  const [search, setSearch] = useState(""); // search state
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -26,7 +30,6 @@ export default function CitizenDashboard() {
     lat: "",
     lng: "",
   });
-  const [error, setError] = useState("");
 
   const load = async () => {
     try {
@@ -39,12 +42,7 @@ export default function CitizenDashboard() {
 
   useEffect(() => {
     load();
-
-    // Auto-refresh every 10s
-    const interval = setInterval(() => {
-      load();
-    }, 10000);
-
+    const interval = setInterval(load, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -74,12 +72,17 @@ export default function CitizenDashboard() {
   const submit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => v != null && fd.append(k, v));
+      Object.entries(form).forEach(([k, v]) => {
+        if (v != null) fd.append(k, v);
+      });
+
       await api.post("/api/issues", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       setForm({
         title: "",
         description: "",
@@ -89,15 +92,13 @@ export default function CitizenDashboard() {
         lat: "",
         lng: "",
       });
+
       load();
     } catch (e) {
-      setError(
-        e?.response?.data?.error || "Failed to create issue (login required?)"
-      );
+      setError(e?.response?.data?.error || "Failed to create issue");
     }
   };
 
-  // Filter issues by search keyword
   const filteredIssues = issues.filter(
     (i) =>
       i.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -106,11 +107,19 @@ export default function CitizenDashboard() {
 
   return (
     <div className="row">
-      {/* Left Panel - Issue Report Form */}
+      {/* LEFT PANEL – FORM */}
       <div className="col-lg-5">
-        <Paper className="p-3 mb-4">
-          <Typography variant="h6" className="mb-2">
-            Report an Issue
+        <Paper
+          elevation={4}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            mb: 4,
+            background: "#f9fafc",
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+             Report an Issue
           </Typography>
 
           {user?.role === "admin" ? (
@@ -119,19 +128,22 @@ export default function CitizenDashboard() {
             </Typography>
           ) : (
             <form onSubmit={submit}>
+              {/* Title */}
               <TextField
                 fullWidth
-                className="mb-2"
                 label="Title"
+                sx={{ mb: 2 }}
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
+
+              {/* Description */}
               <TextField
                 fullWidth
-                className="mb-2"
                 label="Description"
                 multiline
                 rows={3}
+                sx={{ mb: 2 }}
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
@@ -139,10 +151,11 @@ export default function CitizenDashboard() {
               />
 
               {/* Category */}
-              <FormControl fullWidth className="mb-2">
+              <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Category</InputLabel>
                 <Select
                   value={form.category}
+                  label="Category"
                   onChange={(e) =>
                     setForm({ ...form, category: e.target.value })
                   }
@@ -156,10 +169,11 @@ export default function CitizenDashboard() {
               </FormControl>
 
               {/* Priority */}
-              <FormControl fullWidth className="mb-2">
+              <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Priority</InputLabel>
                 <Select
                   value={form.priority}
+                  label="Priority"
                   onChange={(e) =>
                     setForm({ ...form, priority: e.target.value })
                   }
@@ -171,15 +185,23 @@ export default function CitizenDashboard() {
               </FormControl>
 
               {/* File Upload */}
-              <div className="mb-2">
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 2,
+                  border: "1px dashed #bbb",
+                  borderRadius: 2,
+                  textAlign: "center",
+                  background: "#fff",
+                }}
+              >
                 <input
-                  className="form-control"
                   type="file"
                   onChange={(e) =>
                     setForm({ ...form, image: e.target.files[0] })
                   }
                 />
-              </div>
+              </Box>
 
               {/* Coordinates */}
               <div className="row g-2">
@@ -200,38 +222,64 @@ export default function CitizenDashboard() {
                   />
                 </div>
               </div>
+
               <Button
                 type="button"
                 onClick={getLocation}
-                className="mt-2 me-2"
                 variant="outlined"
+                sx={{
+                  mt: 2,
+                  mr: 2,
+                  borderRadius: 2,
+                  textTransform: "none",
+                }}
               >
-                Use my location
+                Use my Location
               </Button>
-              <Button type="submit" className="mt-2" variant="contained">
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  borderRadius: 2,
+                  textTransform: "none",
+                }}
+              >
                 Submit Issue
               </Button>
-              {error && <div className="text-danger mt-2">{error}</div>}
+
+              {error && (
+                <Typography color="error" sx={{ mt: 2 }}>
+                  {error}
+                </Typography>
+              )}
             </form>
           )}
         </Paper>
       </div>
 
-      {/* Right Panel - Issues List */}
+      {/* RIGHT PANEL – LIST OF ISSUES */}
       <div className="col-lg-7">
-        {/*  Search bar */}
         <TextField
           fullWidth
           label="Search Issues"
           variant="outlined"
-          className="mb-3"
+          sx={{
+            mb: 3,
+            borderRadius: 2,
+          }}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {filteredIssues.map((iss) => (
-          <IssueCard key={iss._id} issue={iss} onUpvote={onUpvote} />
-        ))}
+        {filteredIssues.length === 0 ? (
+          <Typography>No issues found.</Typography>
+        ) : (
+          filteredIssues.map((iss) => (
+            <IssueCard key={iss._id} issue={iss} onUpvote={onUpvote} />
+          ))
+        )}
       </div>
     </div>
   );
